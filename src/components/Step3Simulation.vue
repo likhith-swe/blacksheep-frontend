@@ -382,8 +382,8 @@ const doStartSimulation = async () => {
     const params = {
       simulation_id: props.simulationId,
       platform: 'parallel',
-      force: true,  // Force restart
-      enable_graph_memory_update: true  // Enable dynamic graph memory updates
+      force: false,
+      enable_graph_memory_update: true
     }
     
     if (props.maxRounds) {
@@ -408,14 +408,32 @@ const doStartSimulation = async () => {
       startStatusPolling()
       startDetailPolling()
     } else {
-      startError.value = res.error || 'Failed to start simulation'
-      addLog(t('log.startFailed', { error: res.error || t('common.unknownError') }))
-      emit('update-status', 'error')
+      const errStr = res.error || ''
+      if (errStr.includes('already running') || errStr.includes('finalizing') || errStr.includes('already active')) {
+        addLog('Active simulation runner detected. Attaching to real-time stream...')
+        phase.value = 1
+        startStatusPolling()
+        startDetailPolling()
+        emit('update-status', 'processing')
+      } else {
+        startError.value = errStr || 'Failed to start simulation'
+        addLog(t('log.startFailed', { error: errStr || t('common.unknownError') }))
+        emit('update-status', 'error')
+      }
     }
   } catch (err) {
-    startError.value = err.message
-    addLog(t('log.startException', { error: err.message }))
-    emit('update-status', 'error')
+    const errStr = err.message || ''
+    if (errStr.includes('already running') || errStr.includes('finalizing') || errStr.includes('already active')) {
+      addLog('Active simulation runner detected. Attaching to real-time stream...')
+      phase.value = 1
+      startStatusPolling()
+      startDetailPolling()
+      emit('update-status', 'processing')
+    } else {
+      startError.value = errStr
+      addLog(t('log.startException', { error: errStr }))
+      emit('update-status', 'error')
+    }
   } finally {
     isStarting.value = false
   }
@@ -661,9 +679,35 @@ watch(() => props.systemLogs?.length, () => {
   })
 })
 
-onMounted(() => {
+onMounted(async () => {
   addLog(t('log.step3Init'))
   if (props.simulationId) {
+    try {
+      const statusRes = await getRunStatus(props.simulationId)
+      if (statusRes.success && statusRes.data) {
+        const s = statusRes.data.runner_status
+        if (s === 'running' || s === 'paused') {
+          addLog(`Active simulation detected (Round ${statusRes.data.current_round || 0}). Connecting to live stream...`)
+          phase.value = 1
+          runStatus.value = statusRes.data
+          startStatusPolling()
+          startDetailPolling()
+          emit('update-status', 'processing')
+          return
+        } else if (s === 'completed' || s === 'stopped') {
+          addLog('Simulation has completed or stopped. Loading captured actions...')
+          phase.value = 2
+          runStatus.value = statusRes.data
+          startStatusPolling()
+          startDetailPolling()
+          emit('update-status', 'completed')
+          return
+        }
+      }
+    } catch (e) {
+      console.warn('Initial run status check failed:', e)
+    }
+
     doStartSimulation()
   }
 })
