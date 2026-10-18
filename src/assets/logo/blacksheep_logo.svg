@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 200" width="500" height="200">
+  <defs>
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <linearGradient id="hornGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Geometric Ram Icon -->
+  <g transform="translate(30, 25)">
+    <!-- Horns Left -->
+    <path d="M 50 85 C 20 60, 10 30, 35 15 C 60 0, 75 25, 65 45 C 60 55, 52 65, 50 85 Z" fill="url(#hornGrad)" opacity="0.9" filter="url(#glow)"/>
+    <!-- Horns Right -->
+    <path d="M 90 85 C 120 60, 130 30, 105 15 C 80 0, 65 25, 75 45 C 80 55, 88 65, 90 85 Z" fill="url(#hornGrad)" opacity="0.9" filter="url(#glow)"/>
+    
+    <!-- Ram Head Base -->
+    <polygon points="70,50 95,85 85,125 70,145 55,125 45,85" fill="#0f172a" stroke="#38bdf8" stroke-width="3"/>
+    
+    <!-- Forehead Plate -->
+    <polygon points="70,60 85,85 70,105 55,85" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+    
+    <!-- Glowing Cyber Eyes -->
+    <circle cx="60" cy="85" r="3.5" fill="#38bdf8" filter="url(#glow)"/>
+    <circle cx="80" cy="85" r="3.5" fill="#38bdf8" filter="url(#glow)"/>
+    
+    <!-- Muzzle Tech Line -->
+    <line x1="70" y1="105" x2="70" y2="135" stroke="#38bdf8" stroke-width="2"/>
+    <circle cx="70" cy="135" r="2.5" fill="#f59e0b"/>
+  </g>
+
+  <!-- Typography: BLACK SHEEP -->
+  <text x="190" y="88" font-family="'Space Grotesk', 'Inter', -apple-system, sans-serif" font-weight="900" font-size="44" fill="#0f172a" letter-spacing="3">BLACK SHEEP</text>
+  
+  <!-- Subtitle: COLLECTIVE INTELLIGENCE & PREDICTION ENGINE -->
+  <text x="192" y="122" font-family="'JetBrains Mono', 'Space Grotesk', monospace" font-weight="700" font-size="13.5" fill="#0284c7" letter-spacing="2">PREDICTIVE SIMULATION ENGINE</text>
+
+  <!-- Tech Accent Lines -->
+  <line x1="192" y1="138" x2="470" y2="138" stroke="#0284c7" stroke-width="2" stroke-dasharray="8 4"/>
+  <rect x="474" y="135" width="6" height="6" fill="#f59e0b"/>
+</svg>
